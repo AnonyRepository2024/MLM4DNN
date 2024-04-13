@@ -1,5 +1,9 @@
 # MLM4DNN (Element-based Automated DNN Repair with Fine-tuned Masked Language Model)
 
+# Overview of MLM4DNN
+
+![The overview of MLM4DNN](overview.png)
+
 ## Main Components
 1. Fine-tuning
 2. Patch Generation
