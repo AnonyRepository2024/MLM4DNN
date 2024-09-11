@@ -1,0 +1,17 @@
+{
+    "_meta_info": {
+        "model_name": "MLM4DNN",
+        "model_arch": "unixcoder-base (fine-tuned)"
+    },
+    "_infill_api_name": "FinetunedUniXcoder",
+    "model_name_or_path": "microsoft/unixcoder-base",
+    "output_dir": "models/mlm4dnn_model",
+    "max_source_length": 1000,
+    "max_target_length": 24,
+    "beam_size": 10,
+    "train_batch_size": 48,
+    "eval_batch_size": 48,
+    "learning_rate": 5e-5,
+    "gradient_accumulation_steps": 2,
+    "num_train_epochs": 10
+}
