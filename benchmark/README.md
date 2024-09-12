@@ -2,7 +2,7 @@
 
 The directory is used to save benchmark dataset.
 
-1. Download [mlm4dnn_benchmark.tar.gz](https://mega.nz/file/o2NXhKaT#YQFkmbWnYyeTyOt6m9qKc0s_ZPxwSqiwsxedgANxEYs)
+1. Download [mlm4dnn_benchmark.tar.gz](https://mega.nz/file/4nkVwBCJ#06DpFjv9k7xLDiN_Zx0o9R3jfy1_ODYuqyhoEXJfmdo)
 2. Extract and move it here: `tar xzvf mlm4dnn_benchmark.tar.gz`
 
 The tree of this folder is as follows:

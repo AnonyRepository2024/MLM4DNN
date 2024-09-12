@@ -2,7 +2,7 @@
 
 The directory is used to save model checkpoints.
 
-1. Download [mlm4dnn_model.tar.gz](https://mega.nz/file/5y0BWJYQ#kVmRHiaTfX7BD7TRsHn8TsX344Na9wfKgmfww2I8hDI)
+1. Download [mlm4dnn_model.tar.gz](https://mega.nz/file/wzskyDjA#cQYZBXUDnslWwUHQXo-eofwUuxxJ1SC3iZz1pPmLQ1w)
 2. Extract and move it here: `tar xzvf mlm4dnn_model.tar.gz`
 
 The tree of this folder is as follows:
