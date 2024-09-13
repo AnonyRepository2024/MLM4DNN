@@ -13,59 +13,6 @@ from patsy import dmatrices
 
 import _rs_utils as pgrsu
 
-# ouput_dir:
-# model0/
-#     patch0/
-#         train1/
-#             train.log
-#             __...
-#         train2/
-#             train.log
-#             __...
-#         valid_result.json
-#         ...
-#     patch1/
-#         ...
-#     weak_correct_patch_valid_result.json
-#     strong_correct_patch_valid_result.json
-# model1/
-#     ...
-# correct_patches.json:
-
-# valid_result.json:
-# {
-#     "bug": [
-#         score1,
-#         score2,
-#         ...
-#     ],
-#     "fixed": [
-#         score1,
-#         score2,
-#         ...
-#     ],
-#     "patch": [
-#         score1,
-#         score2,
-#         ...
-#     ],
-#     "bug_mean": ...,
-#     "fixed_mean": ...,
-#     "patch_mean": ...,
-#     "bug_patch_stat": {
-#         "p_value": ...,
-#         "effect_size": ...,
-#         "is_diff_sts": ...,
-#         "patch_is_better_sts": ...
-#     }
-# }
-
-# valid_stat.json:
-# [
-#     {"patch": ..., "passed": ...},
-#     ...
-# ]
-
 
 def _sp_run(command, **kwargs):
     import subprocess as sp
@@ -341,10 +288,10 @@ for d in per_model_pacthes:
     d = f"{d}/{patch_subdir}"
     assert os.path.isdir(d)
 
-    weak_correct_patch_valid_result_jf = (
+    weak_correct_patch_valid_result_jf = (  # not weak correct patch in paper
         f"{output_dir}/{model_name}/weak_correct_patch_valid_result.json"
     )
-    strong_correct_patch_valid_result_jf = (
+    strong_correct_patch_valid_result_jf = (  # not strong correct patch in paper
         f"{output_dir}/{model_name}/strong_correct_patch_valid_result.json"
     )
     if os.path.isfile(weak_correct_patch_valid_result_jf) and os.path.isfile(
@@ -461,7 +408,6 @@ for d in per_model_pacthes:
                     patch_scores.append(patch_score)
 
                 if metric_changed:
-                    pgrsu._wlog(f"metric changed: skip this patch {patch_name}")
                     continue
 
                 try:
@@ -575,7 +521,7 @@ def _is_fixed_patch(patch_scores, fixed_scores, bigger_better):
 
 
 count_weak1st_correct_patch = 0
-for d in tqdm.tqdm(per_model_pacthes, desc="Finding weak1st"):
+for d in tqdm.tqdm(per_model_pacthes, desc="Finding Weak Correct Patches"):
     if ".0." in d:
         continue
     model_name = os.path.basename(d)
@@ -593,7 +539,7 @@ for d in tqdm.tqdm(per_model_pacthes, desc="Finding weak1st"):
         valid_result_jf = f"{patch_output_dir}/valid_result.json"
 
         if not os.path.isfile(valid_result_jf):
-            pgrsu._wlog(f"Not found valid result file: {valid_result_jf}")
+            # pgrsu._wlog(f"Not found valid result file: {valid_result_jf}")
             continue  # continue, not break
 
         valid_result = pgrsu._load_json(valid_result_jf)
@@ -606,11 +552,10 @@ for d in tqdm.tqdm(per_model_pacthes, desc="Finding weak1st"):
         weak1st_correct_patch,
         filename=weak1st_correct_patch_valid_result_jf,
     )
-pgrsu._ilog(f"Found {count_weak1st_correct_patch} weak1st correct patches")
 
 
 count_strong2_correct_patch = 0
-for d in tqdm.tqdm(per_model_pacthes, desc="Finding strong2"):
+for d in tqdm.tqdm(per_model_pacthes, desc="Finding Strong Correct Patches"):
     if ".0." in d:
         continue
     model_name = os.path.basename(d)
@@ -633,7 +578,7 @@ for d in tqdm.tqdm(per_model_pacthes, desc="Finding strong2"):
         valid_result_jf = f"{patch_output_dir}/valid_result.json"
 
         if not os.path.isfile(valid_result_jf):
-            pgrsu._wlog(f"Not found valid result file: {valid_result_jf}")
+            # pgrsu._wlog(f"Not found valid result file: {valid_result_jf}")
             continue  # continue, not break
 
         valid_result = pgrsu._load_json(valid_result_jf)
@@ -651,7 +596,7 @@ for d in tqdm.tqdm(per_model_pacthes, desc="Finding strong2"):
             found_strong2_correct_patch = True
             strong2_correct_patch = valid_result
             count_strong2_correct_patch += 1
-            pgrsu._ilog(f"Found strong2 correct patch: {patch_name}")
+            # pgrsu._ilog(f"Found strong2 correct patch: {patch_name}")
             break
     # if j is not None and not strong2_correct_patch:
     #     pgrsu._wlog(f"assert failed: {model_name}")
@@ -660,114 +605,5 @@ for d in tqdm.tqdm(per_model_pacthes, desc="Finding strong2"):
         strong2_correct_patch,
         filename=strong2_correct_patch_valid_result_jf,
     )
-pgrsu._ilog(f"Found {count_weak1st_correct_patch} weak1st correct patches")
-pgrsu._ilog(f"Found {count_strong2_correct_patch} strong2 correct patches")
-
-
-# Save correct_patches.json
-pgrsu._save_as_json(correct_patches, f"{output_dir}/correct_patches.json")
-
-# Save correct_patches.csv
-output_csv = f"{output_dir}/correct_patches.csv"
-count_waek_correct_patch = 0
-count_strong_correct_patch = 0
-with open(output_csv, "w", newline="") as fp:
-    csv_writer = csv.writer(fp)
-    csv_writer.writerow(
-        [
-            "model_name",
-            # Weak correct patch
-            "weak_correct_patch__patch_name",
-            "weak_correct_patch__bug_mean",
-            "weak_correct_patch__fixed_mean",
-            "weak_correct_patch__patch_mean",
-            "weak_correct_patch__bugPtachStat_p_value",
-            "weak_correct_patch__bugPtachStat_effect_size",
-            "weak_correct_patch__bugPtachStat_is_diff_sts",
-            "weak_correct_patch__bugPtachStat_patch_is_better_sts",
-            "weak_correct_patch__bugPtachStat_patch_is_better_than_fixed",
-            # Strong correct patch
-            "strong_correct_patch__patch_name",
-            "strong_correct_patch__bug_mean",
-            "strong_correct_patch__fixed_mean",
-            "strong_correct_patch__patch_mean",
-            "strong_correct_patch__bugPtachStat_p_value",
-            "strong_correct_patch__bugPtachStat_effect_size",
-            "strong_correct_patch__bugPtachStat_is_diff_sts",
-            "strong_correct_patch__bugPtachStat_patch_is_better_sts",
-            "strong_correct_patch__bugPtachStat_patch_is_better_than_fixed",
-        ]
-    )
-    for p in tqdm.tqdm(correct_patches, desc="Stat(Gen CSV)"):
-        model_name = p["model_name"]
-        wcp = p["weak_correct_patch"]
-        scp = p["strong_correct_patch"]
-
-        count_waek_correct_patch += 1 if wcp else 0
-        count_strong_correct_patch += 1 if scp else 0
-
-        weak_correct_patch__patch_name = wcp and wcp["patch_name"]
-        weak_correct_patch__bug_mean = wcp and wcp["bug_mean"]
-        weak_correct_patch__fixed_mean = wcp and wcp["fixed_mean"]
-        weak_correct_patch__patch_mean = wcp and wcp["patch_mean"]
-        weak_correct_patch__bugPtachStat_p_value = (
-            wcp and wcp["bug_patch_stat"]["p_value"]
-        )
-        weak_correct_patch__bugPtachStat_effect_size = (
-            wcp and wcp["bug_patch_stat"]["effect_size"]
-        )
-        weak_correct_patch__bugPtachStat_is_diff_sts = (
-            wcp and wcp["bug_patch_stat"]["is_diff_sts"]
-        )
-        weak_correct_patch__bugPtachStat_patch_is_better_sts = (
-            wcp and wcp["bug_patch_stat"]["patch_is_better_sts"]
-        )
-        weak_correct_patch__bugPtachStat_patch_is_better_than_fixed = (
-            wcp and wcp["bug_patch_stat"]["patch_is_better_than_fixed"]
-        )
-
-        strong_correct_patch__patch_name = scp and scp["patch_name"]
-        strong_correct_patch__bug_mean = scp and scp["bug_mean"]
-        strong_correct_patch__fixed_mean = scp and scp["fixed_mean"]
-        strong_correct_patch__patch_mean = scp and scp["patch_mean"]
-        strong_correct_patch__bugPtachStat_p_value = (
-            scp and scp["bug_patch_stat"]["p_value"]
-        )
-        strong_correct_patch__bugPtachStat_effect_size = (
-            scp and scp["bug_patch_stat"]["effect_size"]
-        )
-        strong_correct_patch__bugPtachStat_is_diff_sts = (
-            scp and scp["bug_patch_stat"]["is_diff_sts"]
-        )
-        strong_correct_patch__bugPtachStat_patch_is_better_sts = (
-            scp and scp["bug_patch_stat"]["patch_is_better_sts"]
-        )
-        strong_correct_patch__bugPtachStat_patch_is_better_than_fixed = (
-            scp and scp["bug_patch_stat"]["patch_is_better_than_fixed"]
-        )
-
-        csv_writer.writerow(
-            [
-                model_name,
-                weak_correct_patch__patch_name,
-                weak_correct_patch__bug_mean,
-                weak_correct_patch__fixed_mean,
-                weak_correct_patch__patch_mean,
-                weak_correct_patch__bugPtachStat_p_value,
-                weak_correct_patch__bugPtachStat_effect_size,
-                weak_correct_patch__bugPtachStat_is_diff_sts,
-                weak_correct_patch__bugPtachStat_patch_is_better_sts,
-                weak_correct_patch__bugPtachStat_patch_is_better_than_fixed,
-                strong_correct_patch__patch_name,
-                strong_correct_patch__bug_mean,
-                strong_correct_patch__fixed_mean,
-                strong_correct_patch__patch_mean,
-                strong_correct_patch__bugPtachStat_p_value,
-                strong_correct_patch__bugPtachStat_effect_size,
-                strong_correct_patch__bugPtachStat_is_diff_sts,
-                strong_correct_patch__bugPtachStat_patch_is_better_sts,
-                strong_correct_patch__bugPtachStat_patch_is_better_than_fixed,
-            ]
-        )
-print(f"Count of weak correct patches: {count_waek_correct_patch}")
-print(f"Count of strong correct patches: {count_strong_correct_patch}")
+pgrsu._ilog(f"Found {count_weak1st_correct_patch} Weak Correct Patches")
+pgrsu._ilog(f"Found {count_strong2_correct_patch} Strong Correct Patches")
