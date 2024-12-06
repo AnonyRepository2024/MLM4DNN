@@ -1,5 +1,19 @@
 # MLM4DNN (Element-based Automated DNN Repair with Fine-tuned Masked Language Model)
 
+# $${\text{\color{orange}NEW!!!\ FOR\ AUTHOR\ RESPONSE!}}$$
+
+#### Details of $Benchmark_{APR4DNN}$ (Discussed in A-Q2 in response letter)
+| #Layers | #Samples | WRC | SRC | SMC |
+|---------|-----------|-----|-----|-----|
+| 2       | 8         | 8   | 7   | 4   |
+| 3       | 16        | 15  | 11  | 7   |
+| 4       | 6         | 5   | 5   | 3   |
+| 5       | 10        | 8   | 4   | 4   |
+| 7       | 3         | 2   | 2   | 2   |
+| 8       | 3         | 2   | 2   | 1   |
+| 10      | 3         | 3   | 3   | 2   |
+| 19      | 2         | 2   | 2   | 2   |
+
 ## Overview of MLM4DNN
 
 ![The overview of MLM4DNN](./overview.png)
